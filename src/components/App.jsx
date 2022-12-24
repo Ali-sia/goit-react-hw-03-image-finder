@@ -49,13 +49,16 @@ export class App extends Component {
     const { showModal } = this.state;
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
+        <button type="button" onClick={this.toggleModal}>
+          open Modal
+        </button>
         <Searchbar />
 
         <ImageGallery />
 
         <Button />
 
-        {showModal && <Modal />}
+        {showModal && <Modal onClose={this.toggleModal} />}
         <GlobalStyle />
       </Box>
     );
