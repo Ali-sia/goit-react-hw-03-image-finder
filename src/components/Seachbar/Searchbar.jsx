@@ -1,4 +1,6 @@
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+
 import {
   SearcHeader,
   SearchForm,
@@ -6,25 +8,55 @@ import {
   SearchInput,
 } from './Searchbar.styled';
 
-const Searchbar = () => {
-  return (
-    <SearcHeader>
-      <SearchForm>
-        <SearchButton type="submit">
-          <span>Search</span>
-        </SearchButton>
+export default class Searchbar extends Component {
+  static propTypes = {
+    searchQuery: PropTypes.string,
+  };
 
-        <SearchInput
-          type="text"
-          autocomplete="off"
-          autofocus
-          placeholder="Search images and photos"
-        />
-      </SearchForm>
-    </SearcHeader>
-  );
-};
+  state = {
+    searchQuery: '',
+  };
 
-export default Searchbar;
+  handleChange = e => {
+    this.setState({
+      searchQuery: e.currentTarget.value.toLowerCase(),
+    });
+  };
 
-Searchbar.propTypes = {};
+  handleSubmit = e => {
+    e.preventDefault();
+
+    if (this.state.searchQuery.trim() === '') {
+      returnalert('enter query');
+    }
+    this.props.onSearch(this.state.searchQuery);
+
+    this.setState({ searchQuery: '' });
+    e.target.searchQuery.value = '';
+  };
+
+  render() {
+    return (
+      <SearcHeader>
+        <SearchForm onSubmit={this.handleSubmit}>
+          <SearchButton type="submit">
+            <span>Search</span>
+          </SearchButton>
+
+          <SearchInput
+            type="text"
+            name="searchQuery"
+            autocomplete="off"
+            autofocus
+            placeholder="Search images and photos"
+            onChange={this.handleChange}
+          />
+        </SearchForm>
+      </SearcHeader>
+    );
+  }
+}
+
+// export default Searchbar;
+
+// Searchbar.propTypes = {};

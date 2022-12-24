@@ -10,6 +10,8 @@ import ImageGallery from './ImageGallery';
 import Button from './Button';
 import Modal from './Modal';
 
+const API_KEY = '13420675-ac3576debf8258c428cd202e5';
+
 export class App extends Component {
   // static propTypes = {
   //   // contacts: PropTypes.arrayOf(
@@ -23,21 +25,29 @@ export class App extends Component {
   // };
 
   state = {
-    // contacts: [],
-    // filter: '',
+    photos: null,
+    searchQuery: '',
+    loading: false,
     showModal: false,
   };
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    fetch(
+      `https://pixabay.com/api/?q=cat&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+    )
+      .then(response => response.json())
+      .then(photos => this.setState({ photos }))
+      .finally(() => this.setState({ loading: false }));
+  }
 
   toggleModal = () => {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  // componentDidMount() {
-  //   // const parsedCcontacts = JSON.parse(localStorage.getItem('contacts'));
-  //   // if (parsedCcontacts) {
-  //   //   this.setState({ contacts: parsedCcontacts });
-  //   // }
-  // }
+  handleFormSubmit = searchQuery => {
+    this.setState({ searchQuery });
+  };
 
   // componentDidUpdate(_, prevState) {
   //   // if (this.state.contacts !== prevState.contacts) {
@@ -49,14 +59,16 @@ export class App extends Component {
     const { showModal } = this.state;
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
-        <button type="button" onClick={this.toggleModal}>
-          open Modal
-        </button>
-        <Searchbar />
+        <Searchbar onSearch={this.handleFormSubmit} />
 
-        <ImageGallery />
+        {this.state.loading && <h2>...load...</h2>}
+        {this.state.photos && (
+          <div>photo cards: {this.state.photos.hits[0].tags}</div>
+        )}
 
-        <Button />
+        {/* <ImageGallery /> */}
+
+        {/* <Button /> */}
 
         {showModal && <Modal onClose={this.toggleModal} />}
         <GlobalStyle />
