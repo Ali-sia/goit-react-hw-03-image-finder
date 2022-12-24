@@ -8,6 +8,7 @@ import { Box } from './Box';
 import Searchbar from './Seachbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
+import Modal from './Modal';
 
 export class App extends Component {
   // static propTypes = {
@@ -21,10 +22,15 @@ export class App extends Component {
   //   // filter: PropTypes.string,
   // };
 
-  // state = {
-  //   // contacts: [],
-  //   // filter: '',
-  // };
+  state = {
+    // contacts: [],
+    // filter: '',
+    showModal: false,
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  };
 
   // componentDidMount() {
   //   // const parsedCcontacts = JSON.parse(localStorage.getItem('contacts'));
@@ -40,14 +46,16 @@ export class App extends Component {
   // }
 
   render() {
+    const { showModal } = this.state;
     return (
-      <Box pr={4} pl={4} color="text" width="400px">
+      <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
         <Searchbar />
 
         <ImageGallery />
 
         <Button />
 
+        {showModal && <Modal />}
         <GlobalStyle />
       </Box>
     );

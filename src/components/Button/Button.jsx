@@ -1,11 +1,8 @@
 import PropTypes from 'prop-types';
+import { ButtonLoadMore } from './Button.styled';
 
 const Button = () => {
-  return (
-    <button className="xfbg" type="button">
-      Load more
-    </button>
-  );
+  return <ButtonLoadMore type="button">Load more</ButtonLoadMore>;
 };
 
 export default Button;

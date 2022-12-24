@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 
+import { Overlay, ModalContainer } from './Modal.styled';
+
 const Modal = () => {
   return (
-    <div class="overlay">
-      <div class="modal">
-        <img src="" alt="" />
-      </div>
-    </div>
+    <Overlay>
+      <ModalContainer>
+        <img src="#" alt="large picture" />
+      </ModalContainer>
+    </Overlay>
   );
 };
 

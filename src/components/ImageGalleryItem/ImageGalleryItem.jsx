@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
+import { GalleryItem, GalleryImage } from './ImageGalleryItem.styled';
 
 const ImageGalleryItem = () => {
   return (
-    <li class="gallery-item">
-      <img src="#" alt="picture" />
-    </li>
+    <GalleryItem>
+      <GalleryImage src="#" alt="picture" />
+    </GalleryItem>
   );
 };
 

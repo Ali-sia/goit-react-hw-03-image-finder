@@ -9,6 +9,9 @@ export const theme = {
     secondary: '#05a',
     accent: '#2196F3',
     muted: '#f6f6f6',
+    header: '#3f51b5',
+    loadMore: '#303f9f',
+    overlay: 'rgba(0, 0, 0, 0.8)',
   },
   space: [0, 2, 4, 8, 16, 32, 64, 128, 256],
   fonts: {
@@ -20,11 +23,13 @@ export const theme = {
     xs: '12px',
     s: '14px',
     m: '16px',
+    ml: '18px',
     l: '32px',
     xl: '64px',
   },
   fontWeights: {
     normal: 400,
+    normalM: 500,
     medium: 600,
     bold: 700,
   },
@@ -38,6 +43,7 @@ export const theme = {
   },
   radii: {
     none: '0',
+    xs: '2px',
     sm: '4px',
     md: '8px',
     lg: '16px',
