@@ -1,36 +1,25 @@
 import PropTypes from 'prop-types';
 
-import { StyledButton } from '../App.styled';
-import { ContactItem } from './ContactList.styled';
-
-const ContactList = ({ contacts, onDeleteContact }) => {
+const Searchbar = () => {
   return (
-    <ul>
-      {contacts.map(({ id, name, number }) => {
-        return (
-          <ContactItem key={id}>
-            <p>
-              {name}, {number}
-            </p>
-            <StyledButton type="button" onClick={() => onDeleteContact(id)}>
-              Delete
-            </StyledButton>
-          </ContactItem>
-        );
-      })}
-    </ul>
+    <header className="searchbar">
+      <form className="form">
+        <button type="submit" className="button">
+          <span className="button-label">Search</span>
+        </button>
+
+        <input
+          className="input"
+          type="text"
+          autocomplete="off"
+          autofocus
+          placeholder="Search images and photos"
+        />
+      </form>
+    </header>
   );
 };
 
-export default ContactList;
+export default Searchbar;
 
-ContactList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  onDeleteContact: PropTypes.func.isRequired,
-};
+Searchbar.propTypes = {};
