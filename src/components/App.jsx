@@ -9,6 +9,8 @@ import Searchbar from './Seachbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
 import Modal from './Modal';
+import Loader from './Loader';
+import PendingErrorMessage from './PendingErrorMessage';
 
 const API_KEY = '13420675-ac3576debf8258c428cd202e5';
 
@@ -27,18 +29,51 @@ export class App extends Component {
   state = {
     photos: null,
     searchQuery: '',
-    loading: false,
+    // loading: false,
     showModal: false,
+    error: null,
+    status: 'idle',
+    page: 1,
   };
 
   componentDidMount() {
-    this.setState({ loading: true });
-    fetch(
-      `https://pixabay.com/api/?q=cat&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then(response => response.json())
-      .then(photos => this.setState({ photos }))
-      .finally(() => this.setState({ loading: false }));
+    // this.setState({ loading: true });
+    // fetch(
+    //   `https://pixabay.com/api/?q=cat&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+    // )
+    //   .then(response => response.json())
+    //   .then(photos => this.setState({ photos }))
+    //   .finally(() => this.setState({ loading: false }));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevQuery = prevState.searchQuery;
+    const nextQuery = this.state.searchQuery;
+
+    if (prevQuery !== nextQuery) {
+      this.setState({ status: 'pending' });
+      fetch(
+        `https://pixabay.com/api/?q=${nextQuery}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          // return Promise.reject(
+          //   new Error(`Cant find anithing by your query ${nextQuery}`)
+          // );
+        })
+        .then(photos => {
+          this.setState({ photos, status: 'resolved' });
+          if (photos.total === 0) {
+            return Promise.reject(
+              new Error(`Cant find anithing by your query ${nextQuery}`)
+            );
+          }
+        })
+        .catch(error => this.setState({ error, status: 'rejected' }));
+      // .finally(() => this.setState({ loading: false }));
+    }
   }
 
   toggleModal = () => {
@@ -49,28 +84,33 @@ export class App extends Component {
     this.setState({ searchQuery });
   };
 
-  // componentDidUpdate(_, prevState) {
-  //   // if (this.state.contacts !== prevState.contacts) {
-  //   //   localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-  //   // }
-  // }
+  openModal = () => {
+    console.log('open big img');
+  };
 
   render() {
-    const { showModal } = this.state;
+    const { showModal, photos, error, status } = this.state;
+    const { largeimageURL, tags } = photos.hits;
+
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
         <Searchbar onSearch={this.handleFormSubmit} />
 
-        {this.state.loading && <h2>...load...</h2>}
-        {this.state.photos && (
-          <div>photo cards: {this.state.photos.hits[0].tags}</div>
+        {status === 'rejected' && (
+          <PendingErrorMessage message={error.message} />
+        )}
+        {status === 'pending' && <Loader />}
+        {status === 'idle' && <div>enter your photo query</div>}
+        {status === 'resolved' && (
+          <>
+            <ImageGallery photos={photos} openModal={this.openModal} />
+            <Button />
+          </>
         )}
 
-        {/* <ImageGallery /> */}
-
-        {/* <Button /> */}
-
-        {showModal && <Modal onClose={this.toggleModal} />}
+        {showModal && (
+          <Modal onClose={this.toggleModal} src={largeimageURL} alt={tags} />
+        )}
         <GlobalStyle />
       </Box>
     );

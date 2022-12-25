@@ -27,7 +27,7 @@ export default class Searchbar extends Component {
     e.preventDefault();
 
     if (this.state.searchQuery.trim() === '') {
-      returnalert('enter query');
+      return alert('enter query');
     }
     this.props.onSearch(this.state.searchQuery);
 
@@ -56,7 +56,3 @@ export default class Searchbar extends Component {
     );
   }
 }
-
-// export default Searchbar;
-
-// Searchbar.propTypes = {};
