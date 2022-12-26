@@ -34,6 +34,8 @@ export class App extends Component {
     error: null,
     status: 'idle',
     page: 1,
+    largeimageURL: '',
+    tags: '',
   };
 
   componentDidMount() {
@@ -64,12 +66,12 @@ export class App extends Component {
           // );
         })
         .then(photos => {
-          this.setState({ photos, status: 'resolved' });
           if (photos.total === 0) {
             return Promise.reject(
               new Error(`Cant find anithing by your query ${nextQuery}`)
             );
           }
+          this.setState({ photos: photos.hits, status: 'resolved' });
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
       // .finally(() => this.setState({ loading: false }));
@@ -89,8 +91,11 @@ export class App extends Component {
   };
 
   render() {
-    const { showModal, photos, error, status } = this.state;
-    const { largeimageURL, tags } = photos.hits;
+    const { showModal, photos, error, status, largeimageURL, tags } =
+      this.state;
+    console.log('🐉 ~~~ ', photos);
+
+    // const { largeimageURL, tags } = photos;
 
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">

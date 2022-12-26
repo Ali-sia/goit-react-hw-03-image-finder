@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+// import React, { Component } from 'react';
 // import PropTypes from 'prop-types';
 
 import ImageGalleryItem from './ImageGalleryItem';
@@ -33,10 +33,10 @@ import { ImageList } from './ImageGallery.styled';
 // }
 
 const ImageGallery = ({ photos, openModal }) => {
-  const photoResponse = photos.hits;
+  // const photoResponse = photos.hits;
   return (
     <ImageList>
-      {photoResponse.map(({ id, webformatURL, tags, largeImageURL }) => (
+      {photos.map(({ id, webformatURL, tags, largeImageURL }) => (
         <ImageGalleryItem
           key={id}
           webformatURL={webformatURL}
