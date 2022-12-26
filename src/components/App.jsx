@@ -11,8 +11,7 @@ import Button from './Button';
 import Modal from './Modal';
 import Loader from './Loader';
 import PendingErrorMessage from './PendingErrorMessage';
-
-const API_KEY = '13420675-ac3576debf8258c428cd202e5';
+import fetchPhotosAPI from '../services/photos-api';
 
 export class App extends Component {
   // static propTypes = {
@@ -27,54 +26,58 @@ export class App extends Component {
   // };
 
   state = {
-    photos: null,
+    photos: [],
+    totalPages: 0,
     searchQuery: '',
-    // loading: false,
     showModal: false,
     error: null,
     status: 'idle',
     page: 1,
-    largeimageURL: '',
+    largeImageURL: '',
     tags: '',
   };
-
-  componentDidMount() {
-    // this.setState({ loading: true });
-    // fetch(
-    //   `https://pixabay.com/api/?q=cat&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-    // )
-    //   .then(response => response.json())
-    //   .then(photos => this.setState({ photos }))
-    //   .finally(() => this.setState({ loading: false }));
-  }
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
+    const prevPage = prevState.page;
+    const nextPage = this.state.page;
 
     if (prevQuery !== nextQuery) {
       this.setState({ status: 'pending' });
-      fetch(
-        `https://pixabay.com/api/?q=${nextQuery}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          }
-          // return Promise.reject(
-          //   new Error(`Cant find anithing by your query ${nextQuery}`)
-          // );
-        })
-        .then(photos => {
-          if (photos.total === 0) {
+      fetchPhotosAPI(nextQuery, this.state.page)
+        .then(({ hits, totalHits }) => {
+          if (totalHits === 0) {
             return Promise.reject(
               new Error(`Cant find anithing by your query ${nextQuery}`)
             );
           }
-          this.setState({ photos: photos.hits, status: 'resolved' });
+          this.setState(prevState => ({
+            page: 1,
+            photos: hits,
+            status: 'resolved',
+            totalPages: totalHits,
+          }));
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
-      // .finally(() => this.setState({ loading: false }));
+    }
+
+    if (prevPage !== nextPage) {
+      this.setState({ status: 'pending' });
+      fetchPhotosAPI(nextQuery, this.state.page)
+        .then(({ hits, totalHits }) => {
+          if (totalHits === 0) {
+            return Promise.reject(
+              new Error(`Cant find anithing by your query ${nextQuery}`)
+            );
+          }
+          this.setState(prevState => ({
+            photos: [...prevState.photos, ...hits],
+            status: 'resolved',
+            totalPages: totalHits,
+          }));
+        })
+        .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
@@ -86,16 +89,29 @@ export class App extends Component {
     this.setState({ searchQuery });
   };
 
-  openModal = () => {
-    console.log('open big img');
+  onOpenModal = (url, tags) => {
+    this.setState({ largeImageURL: url, tags });
+
+    this.toggleModal();
+  };
+
+  onLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+    console.log('this.state.page :>> ', this.state.page);
   };
 
   render() {
-    const { showModal, photos, error, status, largeimageURL, tags } =
-      this.state;
-    console.log('🐉 ~~~ ', photos);
-
-    // const { largeimageURL, tags } = photos;
+    const {
+      showModal,
+      photos,
+      totalPages,
+      error,
+      status,
+      largeImageURL,
+      tags,
+    } = this.state;
 
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
@@ -107,14 +123,14 @@ export class App extends Component {
         {status === 'pending' && <Loader />}
         {status === 'idle' && <div>enter your photo query</div>}
         {status === 'resolved' && (
-          <>
-            <ImageGallery photos={photos} openModal={this.openModal} />
-            <Button />
-          </>
+          <ImageGallery photos={photos} onOpenModal={this.onOpenModal} />
         )}
 
+        {status === 'resolved' &&
+          photos.length > 0 &&
+          photos.length < totalPages && <Button onLoadMore={this.onLoadMore} />}
         {showModal && (
-          <Modal onClose={this.toggleModal} src={largeimageURL} alt={tags} />
+          <Modal onClose={this.toggleModal} src={largeImageURL} alt={tags} />
         )}
         <GlobalStyle />
       </Box>

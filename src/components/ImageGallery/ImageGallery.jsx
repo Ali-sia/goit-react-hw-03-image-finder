@@ -32,7 +32,7 @@ import { ImageList } from './ImageGallery.styled';
 //   }
 // }
 
-const ImageGallery = ({ photos, openModal }) => {
+const ImageGallery = ({ photos, onOpenModal }) => {
   // const photoResponse = photos.hits;
   return (
     <ImageList>
@@ -42,7 +42,7 @@ const ImageGallery = ({ photos, openModal }) => {
           webformatURL={webformatURL}
           largeImageURL={largeImageURL}
           tags={tags}
-          openModal={openModal}
+          onOpenModal={onOpenModal}
         />
       ))}
     </ImageList>

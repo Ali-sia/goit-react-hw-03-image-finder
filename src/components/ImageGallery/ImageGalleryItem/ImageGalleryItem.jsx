@@ -2,23 +2,18 @@
 import { GalleryItem, GalleryImage } from './ImageGalleryItem.styled';
 
 const ImageGalleryItem = ({
-  id,
-  openModal,
+  onOpenModal,
   webformatURL,
   tags,
-  largeimageURL,
+  largeImageURL,
 }) => {
   return (
-    <GalleryItem id={id} onClick={openModal}>
-      <GalleryImage
-        src={webformatURL}
-        alt={tags}
-        largeimageurl={largeimageURL}
-      />
+    <GalleryItem onClick={() => onOpenModal(largeImageURL, tags)}>
+      <GalleryImage src={webformatURL} alt={tags} />
     </GalleryItem>
   );
 };
 
 export default ImageGalleryItem;
 
-ImageGalleryItem.propTypes = {};
+// ImageGalleryItem.propTypes = {};
