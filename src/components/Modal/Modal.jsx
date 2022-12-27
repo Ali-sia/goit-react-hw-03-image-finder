@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import { createPortal } from 'react-dom';
 // import PropTypes from 'prop-types';
+// #TODO
 
 import { Overlay, ModalContainer } from './Modal.styled';
 
 const modalRoot = document.querySelector('#modal-root');
 
 export default class Modal extends Component {
+  // static propTypes = {
+  //   // contacts: PropTypes.arrayOf(
+  //   //   PropTypes.shape({
+  //   //     id: PropTypes.string.isRequired,
+  //   //     name: PropTypes.string.isRequired,
+  //   //     number: PropTypes.string.isRequired,
+  //   //   })
+  //   // ),
+  //   // filter: PropTypes.string,
+  // };
+
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
   }
@@ -39,18 +51,3 @@ export default class Modal extends Component {
     );
   }
 }
-
-// const Modal = () => {
-// return (
-//   <Overlay>
-//     <ModalContainer>
-//       {/* <img src="#" alt="large picture" /> */}
-//       {this.props.children}
-//     </ModalContainer>
-//   </Overlay>
-// );
-// };
-
-// export default Modal;
-
-// Modal.propTypes = {};

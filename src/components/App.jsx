@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 // import { nanoid } from 'nanoid';
 
 import { GlobalStyle } from './GlobalStyle';
@@ -14,121 +14,139 @@ import PendingErrorMessage from './PendingErrorMessage';
 import fetchPhotosAPI from '../services/photos-api';
 
 export class App extends Component {
-  // static propTypes = {
-  //   // contacts: PropTypes.arrayOf(
-  //   //   PropTypes.shape({
-  //   //     id: PropTypes.string.isRequired,
-  //   //     name: PropTypes.string.isRequired,
-  //   //     number: PropTypes.string.isRequired,
-  //   //   })
-  //   // ),
-  //   // filter: PropTypes.string,
-  // };
+  static propTypes = {
+    photos: PropTypes.array,
+    totalPages: PropTypes.number,
+    searchQuery: PropTypes.string,
+    showModal: PropTypes.bool,
+    error: PropTypes.string,
+    status: PropTypes.string,
+    page: PropTypes.number,
+    largeImageURL: PropTypes.string,
+    tags: PropTypes.string,
+  };
 
   state = {
-    photos: [],
-    totalPages: 0,
     searchQuery: '',
-    showModal: false,
+    photos: null,
+    page: 1,
     error: null,
     status: 'idle',
-    page: 1,
+    showModal: false,
     largeImageURL: '',
     tags: '',
   };
 
   componentDidUpdate(prevProps, prevState) {
+    //попередній та поточний запити
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
+    //попередня та поточна сторінка
     const prevPage = prevState.page;
     const nextPage = this.state.page;
+    const firstPage = 1;
 
-    if (prevQuery !== nextQuery) {
-      this.setState({ status: 'pending' });
-      fetchPhotosAPI(nextQuery, this.state.page)
-        .then(({ hits, totalHits }) => {
-          if (totalHits === 0) {
-            return Promise.reject(
-              new Error(`Cant find anithing by your query ${nextQuery}`)
-            );
-          }
-          this.setState(prevState => ({
-            page: 1,
-            photos: hits,
+    //якщо запит змінився
+    if (nextQuery !== prevQuery) {
+      //задати початковий стейт
+      this.setState({
+        page: firstPage,
+        photos: null,
+        status: 'pending',
+        error: null,
+      });
+      //запит до API з новим запитом
+      fetchPhotosAPI(nextQuery, firstPage)
+        .then(photos => {
+          // // обробка помилки (поки не працює)
+          // this.setState({
+          //   status: 'rejected',
+          // });
+          // if (photos.length === 0) {
+          //   return Promise.reject(
+          //     new Error(`Cant find anithing by your query ${nextQuery}`)
+          //   );
+          // }
+          //записати в стейт нові значення (відповідь сервера, зміна статусу)
+          this.setState({
+            photos,
             status: 'resolved',
-            totalPages: totalHits,
-          }));
+          });
         })
-        .catch(error => this.setState({ error, status: 'rejected' }));
+        //обробка звичайної помилки
+        .catch(error =>
+          this.setState({
+            error,
+            status: 'regected',
+          })
+        );
     }
 
-    if (prevPage !== nextPage) {
-      this.setState({ status: 'pending' });
-      fetchPhotosAPI(nextQuery, this.state.page)
-        .then(({ hits, totalHits }) => {
-          if (totalHits === 0) {
-            return Promise.reject(
-              new Error(`Cant find anithing by your query ${nextQuery}`)
-            );
-          }
-          this.setState(prevState => ({
-            photos: [...prevState.photos, ...hits],
+    //якщо сторінка змінилась
+    if (nextPage !== firstPage && nextPage !== prevPage) {
+      fetchPhotosAPI(nextQuery, nextPage)
+        .then(newPhotos => {
+          //записати в стейт нові значення (відповід сервера + запис нового запита, зміна статусу)
+          this.setState({
+            photos: [...this.state.photos, ...newPhotos],
             status: 'resolved',
-            totalPages: totalHits,
-          }));
+          });
         })
-        .catch(error => this.setState({ error, status: 'rejected' }));
+        //обробка звичайної помилки
+        .catch(error =>
+          this.setState({
+            error,
+            status: 'regected',
+          })
+        );
     }
   }
 
+  //відкриття-закриття модалного вікна через стейт
   toggleModal = () => {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
+  //отримання запиту користувача з форми
   handleFormSubmit = searchQuery => {
     this.setState({ searchQuery });
   };
 
+  //відкриття модального вікна у елементах списку з передачею великоформатного зображення
   onOpenModal = (url, tags) => {
     this.setState({ largeImageURL: url, tags });
 
     this.toggleModal();
   };
 
+  //
   onLoadMore = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
-    console.log('this.state.page :>> ', this.state.page);
   };
 
   render() {
-    const {
-      showModal,
-      photos,
-      totalPages,
-      error,
-      status,
-      largeImageURL,
-      tags,
-    } = this.state;
+    const { showModal, photos, error, status, largeImageURL, tags } =
+      this.state;
 
     return (
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
         <Searchbar onSearch={this.handleFormSubmit} />
 
+        {status === 'idle' && <div>Enter your photo query</div>}
+
+        {status === 'resolved' && (
+          <>
+            <ImageGallery photos={photos} onOpenModal={this.onOpenModal} />
+            {photos.length === 12 && <Button onLoadMore={this.onLoadMore} />}
+          </>
+        )}
+        {status === 'pending' && <Loader />}
         {status === 'rejected' && (
           <PendingErrorMessage message={error.message} />
         )}
-        {status === 'pending' && <Loader />}
-        {status === 'idle' && <div>enter your photo query</div>}
-        {status === 'resolved' && (
-          <ImageGallery photos={photos} onOpenModal={this.onOpenModal} />
-        )}
 
-        {status === 'resolved' &&
-          photos.length > 0 &&
-          photos.length < totalPages && <Button onLoadMore={this.onLoadMore} />}
         {showModal && (
           <Modal onClose={this.toggleModal} src={largeImageURL} alt={tags} />
         )}
