@@ -17,20 +17,26 @@ export default class Searchbar extends Component {
     searchQuery: '',
   };
 
+  //-> при зміні значення в інпуті
   handleChange = e => {
+    //записати значення запиту в локальний стейт
     this.setState({
       searchQuery: e.currentTarget.value.toLowerCase(),
     });
   };
 
+  //-> при відправці форми
   handleSubmit = e => {
     e.preventDefault();
 
+    //перевірити запит на пустоту
     if (this.state.searchQuery.trim() === '') {
       return alert('enter query');
     }
+    //передати значення запиту через пропси в апп
     this.props.onSearch(this.state.searchQuery);
 
+    //очистити форму від старого запиту
     this.setState({ searchQuery: '' });
     e.target.searchQuery.value = '';
   };
