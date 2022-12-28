@@ -38,10 +38,11 @@ export default class Searchbar extends Component {
 
     //очистити форму від старого запиту
     this.setState({ searchQuery: '' });
-    e.target.searchQuery.value = '';
+    // e.target.searchQuery.value = '';
   };
 
   render() {
+    const { searchQuery } = this.state;
     return (
       <SearcHeader>
         <SearchForm onSubmit={this.handleSubmit}>
@@ -52,6 +53,7 @@ export default class Searchbar extends Component {
           <SearchInput
             type="text"
             name="searchQuery"
+            value={searchQuery}
             autocomplete="off"
             autofocus
             placeholder="Search images and photos"
