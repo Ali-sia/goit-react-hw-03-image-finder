@@ -7,5 +7,5 @@ const PendingErrorMessage = ({ message }) => {
 export default PendingErrorMessage;
 
 PendingErrorMessage.propTypes = {
-  message: PropTypes.string,
+  message: PropTypes.string.isRequired,
 };
