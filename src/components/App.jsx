@@ -44,7 +44,7 @@ export class App extends Component {
 
     try {
       if (prevState.searchQuery !== searchQuery) {
-        // this.setState({ status: 'pending' });
+        this.setState({ status: 'pending' });
 
         const data = await fetchPhotosAPI(searchQuery, page);
         // data = [total, totalHits, hits]
@@ -64,8 +64,8 @@ export class App extends Component {
       }
 
       if (prevState.page !== page && page !== 1) {
-        // this.setState({ status: 'pending' });
-
+        this.setState({ status: 'pending' });
+        //
         const data = await fetchPhotosAPI(searchQuery, page);
         // data = [total, totalHits, hits]
         const { hits } = data;
@@ -203,7 +203,7 @@ export class App extends Component {
           </Box>
         )}
 
-        {status === 'resolved' && (
+        {photos.length > 0 && (
           <ImageGallery photos={photos} onOpenModal={this.onOpenModal} />
         )}
 
