@@ -5,9 +5,11 @@ const fetchPhotosAPI = async (searchQuery, page) => {
     `https://pixabay.com/api/?q=${searchQuery}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
   );
   const response = await apiFetch.json();
-  const { hits } = response;
+  // const { hits } = response;
 
-  return hits;
+  // return hits;
+
+  return response;
 };
 
 export default fetchPhotosAPI;
